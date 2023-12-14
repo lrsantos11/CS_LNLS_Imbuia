@@ -70,10 +70,10 @@ end
     
 
 """
-        compute_error( x, xold; xsol, normytpe)
+        optimality_check( x, xold; xsol, normytpe)
 """
 
-function compute_error(x::AbstractVector, xold::AbstractVector, xsol::AbstractVector;
+function optimality_check(x::AbstractVector, xold::AbstractVector, xsol::AbstractVector;
     norm_p::Number = 2)
     if isempty(xsol)
         return norm(x - xold, norm_p)
@@ -98,7 +98,9 @@ function MAP(x₀::Vector,
     tolMAP = 1.0
     xMAP = copy(x₀)
     ProjA = ProjectA(xMAP)
-    while tolMAP > ε && k < itmax
+    tired = false
+    solved = false
+    while !(tired || solved) 
         ProjA = ProjectA(xMAP)
         if gap_distance
             xMAP = ProjectB(ProjA)
@@ -106,10 +108,14 @@ function MAP(x₀::Vector,
         else
             xMAPOld = copy(xMAP)
             xMAP = ProjectB(ProjA)
-            tolMAP = compute_error(xMAP, xMAPOld, xSol)
+            tolMAP = optimality_check(xMAP, xMAPOld, xSol)
         end
-        k += 2
+        k += 1
+
+        tired = k >= itmax
+        solved = tolMAP < ε
     end
-    return k, tolMAP, xMAP
+    solved ? status = :Solved : status = :MaxIt
+    return k, tolMAP, xMAP, status 
 end
 
