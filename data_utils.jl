@@ -1,7 +1,7 @@
 using DataFrames
 using CSV
 using Plots
-
+ 
 
 # Load data
 nist_data_files = readdir("data/nist_data/")
@@ -27,4 +27,10 @@ function get_normally_dist_data(t_data:: Vector{Number}, interferogram_data:: Ve
     iDFTₙ          = iDFTx(tₙ)
 
     return [tₙ, interferogramₙ, iDFTₙ]
+end
+
+function iDFTx(x:: Vector{Number}; n=n, n₂=n₂)
+    ω₁=[exp(2*π*im*x[m])/n for m=1:n]
+
+    return reduce(hcat, [ω₁.^(k/n) for k=-n₂:n₂])
 end
