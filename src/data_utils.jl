@@ -1,7 +1,9 @@
 using DataFrames
 using CSV
+using Random
+using StatsBase
 using Plots
-
+ 
 
 # Load data
 nist_data_files = readdir("data/nist_data/")
@@ -18,13 +20,4 @@ function plot_nist_data(nist_data_files)
         plot!(plt, nist_data_x, nist_data_y, label=nist_csv_file[1:end-4], legend=:topright, xlabel="Wavenumbers (cm-1)", ylabel="(micromol/mol)-1m-1 (base 10)", subplot=index)
     end
     return plt
-end
-
-function get_normally_dist_data(t_data:: Vector{Number}, interferogram_data:: Vector{Number}, n:: Int64; iDFTx=iDFTx)
-    # n random samples randomly distributed
-    tₙ             = rand(t_data, n, replace=false)
-    interferogramₙ = interferogram_data[tₙ] 
-    iDFTₙ          = iDFTx(tₙ)
-
-    return [tₙ, interferogramₙ, iDFTₙ]
 end
