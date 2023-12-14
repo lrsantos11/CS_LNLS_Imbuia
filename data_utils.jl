@@ -20,4 +20,11 @@ function plot_nist_data(nist_data_files)
     return plt
 end
 
-plot_nist_data(nist_data_files)
+function get_normally_dist_data(t_data:: Vector{Number}, interferogram_data:: Vector{Number}, n:: Int64; iDFTx=iDFTx)
+    # n random samples randomly distributed
+    tₙ             = rand(t_data, n, replace=false)
+    interferogramₙ = interferogram_data[tₙ] 
+    iDFTₙ          = iDFTx(tₙ)
+
+    return [tₙ, interferogramₙ, iDFTₙ]
+end
