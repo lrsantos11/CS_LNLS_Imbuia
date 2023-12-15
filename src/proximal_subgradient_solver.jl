@@ -1,9 +1,9 @@
 using Plots
 using LaTeXStrings
 
-function proximal_subgradient(f:: Function, g:: Function, ∂f:: Function, Lₖ:: Function, x₀:: Array{<:Number}, s:: Number, k_max:: Int64; ϵ=eps, p=Inf)
+function proximal_subgradient(f:: Function, ∂f:: Function, Lₖ:: Function, x₀:: Array{<:Number}, L₀:: Number, s:: Number, k_max:: Int64; ϵ=eps(), p=Inf)
     x=x₀
-    L=s
+    L=L₀
     k=0
     solved=false
     
@@ -11,9 +11,10 @@ function proximal_subgradient(f:: Function, g:: Function, ∂f:: Function, Lₖ:
         ∂fx=∂f(x)
         fx=f(x)
         L, x=Lₖ(L, k, x, fx, ∂fx) #Backtracking mais atualização
-
+        
+        solved=(norm(∂fx, p)<ϵ)
         k+=1
-        solved=norm(∂fx, p)<ϵ
+        print(k)
     end 
 
     return x
