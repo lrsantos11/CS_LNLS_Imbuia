@@ -19,7 +19,7 @@ function get_s(methods:: Vector{Symbol}, iDFT:: Array{<:Number}, interferogram::
     return spectrum
 end
 
-function get_spectogram_from_sample(methods:: Vector{Symbol}, interferogram:: Vector{<:Number}, percent:: Number)
+function get_spectogram_from_sample(interferogram::Vector{Number}, percent:: Number)
     n = length(interferogram)
     sampleₙ, interferogramₙ, iDFTₙ = get_normally_dist_data(collect(1:n), interferogram, n)
 
@@ -51,10 +51,9 @@ p₁=plot(frequency_range, real.(fft(interferogram)), label="Data")
 plot!(frequency_range, spectrum_imag, label="Reconstructed from double FFT")
 plot!(title="Interferogram of silicone")
 
-methods=[:proximal_gradient_method]
 percent=0.5
 
-sampleₘ, interferogramₘ, iDFTₘ, spectrumₘ = get_spectogram_from_sample(methods, interferogram, percent)
+sampleₘ, interferogramₘ, iDFTₘ, spectrumₘ = get_spectogram_from_sample(interferogram, percent)
 
 p₂, p₃ = plot_all(frequency_range, spectrumₘ, spectrum_imag, sampleₘ, [i for i=1:length(interferogram)], iDFTₘ, real.(interferogram))
 plot(p₂, p₃)
