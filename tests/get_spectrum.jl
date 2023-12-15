@@ -19,9 +19,9 @@ function get_s(methods:: Vector{Symbol}, iDFT:: Array{<:Number}, interferogram::
     return spectrum
 end
 
-function get_spectogram_from_sample(methods:: Vector{Symbol}, interferogram:: Vector{<:Number}, percent:: Number; λ=1.0)
-    n                = length(interferogram)
-    sampleₙ, interferogramₙ, iDFTₙ = get_normally_dist_data([i for i=1:n], interferogram, n)
+function get_spectogram_from_sample(methods:: Vector{Symbol}, interferogram:: Vector{<:Number}, percent:: Number)
+    n = length(interferogram)
+    sampleₙ, interferogramₙ, iDFTₙ = get_normally_dist_data(collect(1:n), interferogram, n)
 
     # m sub-samples
     rows_id        = sample(1:n, round(Int, percent*n))
@@ -29,7 +29,7 @@ function get_spectogram_from_sample(methods:: Vector{Symbol}, interferogram:: Ve
     interferogramₘ = interferogramₙ[rows_id]
     iDFTₘ          = iDFTₙ[rows_id, :]
 
-    return [sampleₘ, interferogramₘ, iDFTₘ, get_s(methods, iDFTₘ, interferogramₘ; λ=λ)]
+    return sampleₘ, interferogramₘ, iDFTₘ
 end
 
 nist_csv_file_re = "63148-62-9-IR_Re_Silicone oil.csv"
@@ -40,23 +40,21 @@ frequency_range  = df_nist_data_re[:, :x]
 spectrum_real    = df_nist_data_re[:, :y]
 spectrum_imag    = df_nist_data_im[:, :y]
 
-interferogram_imag = ifft(spectrum_imag)
+interferogram = ifft(spectrum_imag)
 
 # If you want to try the full signal... 
 #spectrum_full = spectrum_real+im*spectrum_imag
 #interferogram_full = ifft(spectrum_full)
 #get_spectogram_from_sample(methods, interferogram_full, percent)
 
-p₁=plot(frequency_range, real.(fft(interferogram_imag)), label="Data")
+p₁=plot(frequency_range, real.(fft(interferogram)), label="Data")
 plot!(frequency_range, spectrum_imag, label="Reconstructed from double FFT")
 plot!(title="Interferogram of silicone")
-display(p₁)
 
 methods=[:proximal_gradient_method]
 percent=0.5
-λ=1.0
 
-sampleₘ, interferogramₘ, iDFTₘ, spectrumₘ=get_spectogram_from_sample(methods, interferogram_imag, percent; λ=λ)
+sampleₘ, interferogramₘ, iDFTₘ, spectrumₘ = get_spectogram_from_sample(methods, interferogram, percent)
 
-p₂, p₃ = plot_all(frequency_range, spectrumₘ, spectrum_imag, sampleₘ, [i for i=1:length(interferogram_imag)], iDFTₘ, real.(interferogram_imag))
+p₂, p₃ = plot_all(frequency_range, spectrumₘ, spectrum_imag, sampleₘ, [i for i=1:length(interferogram)], iDFTₘ, real.(interferogram))
 plot(p₂, p₃)

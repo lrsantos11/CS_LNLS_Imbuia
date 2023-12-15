@@ -5,9 +5,9 @@ function iDFTx(x:: Vector{<:Number}; n=1)
     return reduce(hcat, [ω₁.^(k/n) for k=-n₂:n₂])
 end
 
-function get_normally_dist_data(t_data:: Vector{<:Number}, interferogram_data:: Vector{<:Number}, n:: Int64; iDFTx=iDFTx)
+function get_normally_dist_data(t_data:: Vector{<:Number}, interferogram_data:: Vector{<:Number}, n:: Int64)
     # n random samples randomly distributed
-    sampleₙ        = sample(t_data, n)
+    sampleₙ        = sample(1:n, n)
     interferogramₙ = interferogram_data[sampleₙ] 
     iDFTₙ          = iDFTx(sampleₙ; n=n)
 
